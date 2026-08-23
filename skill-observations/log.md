@@ -67,3 +67,20 @@
 **Suggested improvement:** Build a decision tree for Hackintosh boot failures: if error is at EB|LD.OFS or EB.RH.LRH → check SecureBootModel first.
 
 **Principle:** Common failure modes should be checked first, before auditing complex configurations.
+
+---
+
+### Observation 5: Task observer needs enforcement mechanism, not just instructions
+
+**Status:** OPEN
+**Date:** 2026-08-22
+**Disposition:** AGENT-ACTION
+**Session context:** User noticed skill-observations/log.md was empty after a full session
+**Skill:** Task Observer (self-improvement)
+**Phase/Area:** Enforcement / reliability
+
+**Issue:** The task observer steering file says "log immediately" but provides no enforcement. During a task-heavy session (reorganizing repo, debugging boot, pushing to git), observations were never logged until the user explicitly called it out at the end. The "observe silently" instruction got completely ignored under task focus.
+
+**Suggested improvement:** Added an `agentStop` hook (`log-skill-observations`) that prompts observation review at session end. This provides a structural backstop rather than relying on self-discipline during flow. Consider whether this hook should be global (across all workspaces) rather than workspace-specific.
+
+**Principle:** Behavioral instructions that lack structural enforcement will be dropped under cognitive load. Add hooks/triggers for behaviors that must happen reliably.

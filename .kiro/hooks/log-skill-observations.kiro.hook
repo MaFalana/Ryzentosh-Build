@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Log Skill Observations",
+  "description": "Reminds the agent to review the session for skill observations and append any to skill-observations/log.md before the session ends",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before ending, review this session for skill observations. Check: Were there corrections from the user? Repeated patterns? New workflows? Missing rules? If yes, append observations to skill-observations/log.md following the format in the task-observer steering file. If nothing notable happened, skip."
+  }
+}
