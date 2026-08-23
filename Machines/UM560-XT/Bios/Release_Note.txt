@@ -1,0 +1,107 @@
+*****************************************
+*          BIOS Release Notice             *    
+*****************************************
+Release Date:
+    2023/03/31
+
+BIOS Version:
+    5.09
+
+BIOS Checksum:
+    27DD
+
+BIOS Description:
+    1.Add GFX UMA size item control  in bios setup
+    2.Set power limit for 65W adapter
+=============================================
+Release Date:
+    2023/02/17
+
+BIOS Version:
+    5.08
+
+BIOS Checksum:
+    CE93
+
+BIOS Description:
+     1.Modify secure boot default on
+=============================================
+Release Date:
+    2022/11/09
+
+BIOS Version:
+    5.07
+
+BIOS Checksum:
+    0761
+
+BIOS Description:
+     1.Add auto detect cpu to support UM550
+=============================================
+Release Date:
+    2022/09/21
+
+BIOS Version:
+    5.06
+
+BIOS Checksum:
+    8A3E
+
+BIOS Description:
+     1.modify DMI BASEBOARD MANUFACTURER Shenzhen Meigao Electronic Equipment Co.,Ltd
+     2.modify DMI SYSTEM MANUFACTURER Micro Computer (HK) Tech Limited
+===============================
+
+Release Date:
+    2022/08/12
+
+BIOS Version:
+    5.05
+
+BIOS Description:
+     1.Update crb code to version 22
+     2.modify dmi message
+     3.add oem logo
+========================================
+Release Date:
+    2022/07/01
+
+BIOS Version:
+    5.04
+
+BIOS Description:
+     1.fixup smart fan full speed when power on first 2 sec
+========================================
+Release Date:
+    2022/06/08
+
+BIOS Version:
+    5.03
+
+BIOS Description:
+    1. maping CPUTIN to system temperature
+
+========================================
+Release Date:
+    2022/06/06
+
+BIOS Version:
+    5.02
+
+BIOS Description:
+    1. Modify DMI string BESSTAR TECH to  BESSTAR TECH  LIMITED
+    2. Modify AC Loss Control default to OFF
+
+
+========================================
+Release Date:
+    2022/06/02
+
+BIOS Version:
+    0.01
+
+BIOS Description:
+    Base on UM560_220512A modify
+    1. Add show bios version in setup
+    2. Modify smart fan default setting
+    3. Remove PS2 KB/MS support 

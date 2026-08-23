@@ -1,0 +1,1 @@
+AfuEfix64.efi UM560XT.rom /p /b /n /k /x /reboot

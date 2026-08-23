@@ -1,0 +1,1 @@
+AFUWINx64.EXE UM560XT.rom /p /b /n /k /x /reboot

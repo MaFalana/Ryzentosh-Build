@@ -1,0 +1,6 @@
+.DS_Store
+**/.DS_Store
+
+# Large binary drivers (exceed GitHub 100MB limit, re-downloadable)
+Machines/UM560-XT/Drivers/
+Machines/UM560-XT/*.exe
