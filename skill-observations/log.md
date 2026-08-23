@@ -118,3 +118,20 @@
 **Suggested improvement:** When receiving context from other AI sessions, extract: (1) what was tried, (2) what worked, (3) what failed, (4) what's still pending. Summarize back to the user concisely and ask which threads to pick up.
 
 **Principle:** Treat cross-session AI context as a research dump, not a conversation to continue. Extract facts and status, discard the back-and-forth.
+
+---
+
+### Observation 8: User prefers short file names
+
+**Status:** OPEN
+**Date:** 2026-08-22
+**Disposition:** AGENT-ACTION
+**Session context:** Created a doc file named `multi-boot-installer-usb.md`, user said "I hate the long file names you use for docs"
+**Skill:** General file naming conventions
+**Phase/Area:** File creation
+
+**Issue:** Defaulted to a verbose, descriptive filename (`multi-boot-installer-usb.md`) when a shorter name (`installer-usb.md`) communicates the same thing within context. The folder (`docs/`) already provides context — the filename doesn't need to repeat it.
+
+**Suggested improvement:** Keep filenames to 1-2 words max. Let folder hierarchy provide context. Prefer `installer-usb.md` over `multi-boot-installer-usb-guide.md`. Same applies to folders — already got this right with `Archive/`, `Scripts/`, `Configs/`.
+
+**Principle:** Short filenames. Context comes from the folder, not the filename.
