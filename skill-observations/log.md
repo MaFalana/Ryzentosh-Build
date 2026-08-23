@@ -152,3 +152,72 @@
 **Suggested improvement:** Update the installer-usb doc to show `--list-full-installers` first, then use the exact version from the output. Don't hardcode version numbers that may go stale.
 
 **Principle:** Documentation that references versioned resources should include a discovery step, not hardcoded values that go stale.
+
+---
+
+### Observation 10: USB boot priority not addressed in test instructions
+
+**Status:** OPEN
+**Date:** 2026-08-23
+**Disposition:** AGENT-ACTION
+**Session context:** User booted from internal EFI (with custom ASUS ROG theme) instead of the USB's OpenCore
+**Skill:** Hackintosh EFI management workflow / installer-usb doc
+**Phase/Area:** Test instructions
+
+**Issue:** The test checklist said "Boot → OpenCore picker should appear" but didn't address that an existing OpenCore install on the internal drive will take priority over the USB. User ended up booting the wrong OpenCore. Should have explicitly said "enter BIOS boot menu (F8) and select the USB drive" or explained how to distinguish which OpenCore is running.
+
+**Suggested improvement:** Test instructions and the installer-usb doc should always include: (1) how to force-boot from USB via BIOS boot menu key, (2) how to tell which OpenCore is running (Builtin=text vs External=graphical). Add ASUS-specific boot key (F8) to the doc.
+
+**Principle:** When multiple bootloaders exist, test instructions must specify which one to boot from and how to verify you're running the right one.
+
+---
+
+### Observation 11: DmgLoading=Signed causes silent boot failure back to picker
+
+**Status:** OPEN
+**Date:** 2026-08-23
+**Disposition:** AGENT-ACTION
+**Session context:** User selected macOS installer from OpenCore picker and it silently returned to the picker with no error
+**Skill:** Hackintosh boot debugging
+**Phase/Area:** Silent failure diagnosis
+
+**Issue:** When `DmgLoading=Signed` rejects an installer DMG, OpenCore doesn't show an error — it just returns to the picker. This is a different symptom than the `Err(0xE)` from before (which showed verbose errors). I focused only on SecureBootModel initially and missed that the internal EFI's `DmgLoading` was also `Signed`. Both settings need to be fixed together.
+
+**Suggested improvement:** When fixing SecureBootModel issues, always check DmgLoading at the same time — they're related. Both `SecureBootModel=Disabled` AND `DmgLoading=Any` should be set together for troubleshooting. A silent return-to-picker is the telltale sign of DmgLoading rejection.
+
+**Principle:** Silent failures need documented symptoms. "Returns to picker with no error" = check DmgLoading. Build a symptom→cause mapping for Hackintosh debugging.
+
+
+---
+
+### Observation 12: NVRAM reset instructions must specify which OpenCore to boot from
+
+**Status:** OPEN
+**Date:** 2026-08-23
+**Disposition:** AGENT-ACTION
+**Session context:** Advising user to reset NVRAM to fix stale boot-args
+**Skill:** Hackintosh boot debugging
+**Phase/Area:** Multi-EFI awareness
+
+**Issue:** Told user to "Reset NVRAM from the picker" without considering that they have TWO OpenCore installations (internal NVMe + USB). Resetting NVRAM from the wrong OpenCore repopulates with the wrong config's values. User had already mentioned in a prior session that they can't boot the USB because the BIOS always grabs the internal NVMe's OpenCore first. Had to be corrected.
+
+**Suggested improvement:** When advising NVRAM reset in a multi-OC setup, always: (1) identify which OC the user can actually boot, (2) confirm that OC has the correct config, (3) if it doesn't, pivot to "update the accessible config first" rather than insisting on NVRAM reset from the unreachable one.
+
+**Principle:** In multi-bootloader setups, never assume the user can boot from a specific EFI. Always verify which one is actually reachable before giving instructions.
+
+---
+
+### Observation 13: Cross-machine handoff docs are a recurring workflow
+
+**Status:** OPEN
+**Date:** 2026-08-23
+**Disposition:** USER-ACTION
+**Session context:** User switching from Mac (remote) to the target PC to continue EFI work
+**Skill:** New skill candidate: Cross-machine session continuity
+**Phase/Area:** Context transfer
+
+**Issue:** User explicitly asked to "make a file to get the other machine up to speed" — they work across multiple machines on the same repo and need a structured way to hand off in-progress state between Kiro sessions on different devices. Created `docs/current-status.md` as an ad-hoc solution.
+
+**Suggested improvement:** Consider a standardized "handoff" doc pattern for multi-machine workflows: current state, what needs to happen next, which files matter, and key decisions already made. Could live at a predictable path like `docs/current-status.md` or `.kiro/steering/current-status.md` (auto-included).
+
+**Principle:** When work spans multiple machines/sessions, make the transfer state explicit and machine-readable rather than relying on conversation history.

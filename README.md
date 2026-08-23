@@ -4,7 +4,7 @@ Hackintosh configuration for a custom AMD desktop. Triple-boot: Windows 11, Stea
 
 ## Status
 
-**macOS Sequoia:** In progress — boot fails at Secure Boot validation (`Err(0xE)`). Fix applied in `In Development/`, pending test.
+**macOS Sequoia:** In progress — SecureBootModel fix works (kernel loads, EXITBS reached). Now rebooting at Apple logo due to stale NVRAM boot-args (missing `agdpmod=pikera`). Next step: deploy `EFI-20260822` to internal NVMe's EFI partition from Windows.
 
 ## Hardware
 
