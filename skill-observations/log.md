@@ -84,3 +84,20 @@
 **Suggested improvement:** Added an `agentStop` hook (`log-skill-observations`) that prompts observation review at session end. This provides a structural backstop rather than relying on self-discipline during flow. Consider whether this hook should be global (across all workspaces) rather than workspace-specific.
 
 **Principle:** Behavioral instructions that lack structural enforcement will be dropped under cognitive load. Add hooks/triggers for behaviors that must happen reliably.
+
+---
+
+### Observation 6: Enable debug logging proactively in development EFIs
+
+**Status:** OPEN
+**Date:** 2026-08-22
+**Disposition:** AGENT-ACTION
+**Session context:** User asked if EFI has error log reporting; it wasn't enabled
+**Skill:** Hackintosh EFI management workflow
+**Phase/Area:** Debug configuration
+
+**Issue:** The In Development EFI had `Target=3` (screen only) and `AppleDebug/ApplePanic=false`. This means after a failed boot, the only diagnostic is a photo of the screen. The user had to ask about log files — this should have been enabled by default when building a troubleshooting EFI.
+
+**Suggested improvement:** Any EFI in "In Development" should always have file logging enabled (Target=67, AppleDebug=true, ApplePanic=true). Only disable verbose output when moving to a "working" state.
+
+**Principle:** Development/debug configurations should maximize diagnostic output by default. Reduce logging when promoting to production, not the other way around.
