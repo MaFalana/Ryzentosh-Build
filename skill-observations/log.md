@@ -101,3 +101,20 @@
 **Suggested improvement:** Any EFI in "In Development" should always have file logging enabled (Target=67, AppleDebug=true, ApplePanic=true). Only disable verbose output when moving to a "working" state.
 
 **Principle:** Development/debug configurations should maximize diagnostic output by default. Reduce logging when promoting to production, not the other way around.
+
+---
+
+### Observation 7: User shares context from other AI sessions as knowledge transfer
+
+**Status:** OPEN
+**Date:** 2026-08-22
+**Disposition:** AGENT-ACTION
+**Session context:** User pasted a full ChatGPT conversation about SteamOS boot picker configuration
+**Skill:** New skill candidate: Cross-session context ingestion
+**Phase/Area:** Information synthesis
+
+**Issue:** User dumped a long ChatGPT conversation covering SteamOS OpenCore picker setup, custom icons, .contentFlavour attempts, and BlessOverride suggestions. The key information needed to be extracted and synthesized — not treated as instructions to follow blindly.
+
+**Suggested improvement:** When receiving context from other AI sessions, extract: (1) what was tried, (2) what worked, (3) what failed, (4) what's still pending. Summarize back to the user concisely and ask which threads to pick up.
+
+**Principle:** Treat cross-session AI context as a research dump, not a conversation to continue. Extract facts and status, discard the back-and-forth.

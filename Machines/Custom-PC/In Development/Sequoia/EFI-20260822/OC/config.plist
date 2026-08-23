@@ -1179,7 +1179,9 @@
         <key>Misc</key>
         <dict>
             <key>BlessOverride</key>
-            <array/>
+            <array>
+                <string>\EFI\steamos\grubx64.efi</string>
+            </array>
             <key>Boot</key>
             <dict>
                 <key>ConsoleAttributes</key>
