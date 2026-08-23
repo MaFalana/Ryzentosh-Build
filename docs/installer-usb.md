@@ -73,17 +73,25 @@ This creates:
 
 ### Download Sequoia
 
+First, check which versions Apple currently offers:
+
 ```bash
-softwareupdate --fetch-full-installer --full-installer-version 15.0
+softwareupdate --list-full-installers
+```
+
+Then download using an exact version from the list:
+
+```bash
+softwareupdate --fetch-full-installer --full-installer-version 15.5
 ```
 
 This downloads to `/Applications/Install macOS Sequoia.app` (~14GB).
 
-> **Other versions:**
+> **Other versions** (use `--list-full-installers` to confirm availability):
 > ```bash
-> softwareupdate --fetch-full-installer --full-installer-version 14.0  # Sonoma
-> softwareupdate --fetch-full-installer --full-installer-version 13.0  # Ventura
-> softwareupdate --fetch-full-installer --full-installer-version 12.0  # Monterey
+> softwareupdate --fetch-full-installer --full-installer-version 14.x  # Sonoma
+> softwareupdate --fetch-full-installer --full-installer-version 13.x  # Ventura
+> softwareupdate --fetch-full-installer --full-installer-version 12.x  # Monterey
 > ```
 
 ### Write to USB

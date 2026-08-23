@@ -135,3 +135,20 @@
 **Suggested improvement:** Keep filenames to 1-2 words max. Let folder hierarchy provide context. Prefer `installer-usb.md` over `multi-boot-installer-usb-guide.md`. Same applies to folders — already got this right with `Archive/`, `Scripts/`, `Configs/`.
 
 **Principle:** Short filenames. Context comes from the folder, not the filename.
+
+---
+
+### Observation 9: softwareupdate requires exact point release versions
+
+**Status:** OPEN
+**Date:** 2026-08-22
+**Disposition:** AGENT-ACTION
+**Session context:** User ran `softwareupdate --fetch-full-installer --full-installer-version 15.0` and got "Update not found"
+**Skill:** Hackintosh EFI management workflow / installer-usb doc
+**Phase/Area:** macOS installer download instructions
+
+**Issue:** The doc uses `--full-installer-version 15.0` as an example, but Apple removes older point releases from the catalog. The user hit this immediately. Should have documented `--list-full-installers` as the first step to find available versions.
+
+**Suggested improvement:** Update the installer-usb doc to show `--list-full-installers` first, then use the exact version from the output. Don't hardcode version numbers that may go stale.
+
+**Principle:** Documentation that references versioned resources should include a discovery step, not hardcoded values that go stale.
