@@ -4,21 +4,21 @@ Hackintosh configuration for a custom AMD desktop. Triple-boot: Windows 11, Stea
 
 ## Status
 
-**macOS Sequoia:** In progress — SecureBootModel fix works (kernel loads, EXITBS reached). Now rebooting at Apple logo due to stale NVRAM boot-args (missing `agdpmod=pikera`). Next step: deploy `EFI-20260822` to internal NVMe's EFI partition from Windows.
+**macOS Sequoia:** In progress — kernel loads and EXITBS reached, but panics during kernel init (post-EXITBS). Testing with `ProvideCurrentCpuInfo=false` and `npci=0x2000`. EFI-20260822 deployed to internal NVMe.
 
 ## Hardware
 
-| Component | Model |
-|-----------|-------|
-| Motherboard | ASUS ROG STRIX B850-A Gaming WiFi |
-| CPU | AMD Ryzen 9 7950X (16-core, Zen 4) |
-| GPU | AMD Radeon RX 6600 (Navi 23, 8GB) |
-| RAM | 2x32GB Crucial DDR5 Pro 5600MHz (64GB) |
-| Audio | AMD High Definition Audio (HDMI), Realtek USB Audio |
-| Ethernet | Intel I226-V |
-| WiFi/BT | BCM94360NG with FV-HB1200 adapter (native macOS) |
-| Storage | 3x NVMe (Windows, SteamOS, macOS — separate drives) |
-| Bluetooth | Apple Broadcom Built-In (via BCM94360NG) |
+| Component   | Model                                               |
+| ----------- | --------------------------------------------------- |
+| Motherboard | ASUS ROG STRIX B850-A Gaming WiFi                   |
+| CPU         | AMD Ryzen 9 7950X (16-core, Zen 4)                  |
+| GPU         | AMD Radeon RX 6600 (Navi 23, 8GB)                   |
+| RAM         | 2x32GB Crucial DDR5 Pro 5600MHz (64GB)              |
+| Audio       | AMD High Definition Audio (HDMI), Realtek USB Audio |
+| Ethernet    | Intel I226-V                                        |
+| WiFi/BT     | BCM94360NG with FV-HB1200 adapter (native macOS)    |
+| Storage     | 3x NVMe (Windows, SteamOS, macOS — separate drives) |
+| Bluetooth   | Apple Broadcom Built-In (via BCM94360NG)            |
 
 ## Project Structure
 
@@ -33,15 +33,15 @@ Machines/Custom-PC/
 
 ## Required BIOS Settings
 
-| Setting | Value |
-|---------|-------|
-| Above 4G Decoding | Enabled |
-| Resizable BAR | Disabled |
-| CSM | Disabled |
-| Secure Boot | Disabled |
-| IOMMU | Disabled |
-| XHCI Hand-off | Enabled |
-| Serial Port | Disabled |
+| Setting           | Value    |
+| ----------------- | -------- |
+| Above 4G Decoding | Enabled  |
+| Resizable BAR     | Disabled |
+| CSM               | Disabled |
+| Secure Boot       | Disabled |
+| IOMMU             | Disabled |
+| XHCI Hand-off     | Enabled  |
+| Serial Port       | Disabled |
 
 ## Working
 
@@ -53,26 +53,26 @@ Machines/Custom-PC/
 
 ## Kexts
 
-| Kext | Purpose |
-|------|---------|
-| Lilu | Patching framework (required by all others) |
-| VirtualSMC | SMC emulation |
-| WhateverGreen | GPU patching (RX 6600) |
-| AppleIGC | Intel I226-V Ethernet (disabled for now) |
-| AppleMCEReporterDisabler | Prevents MCE crashes on AMD |
-| NVMeFix | NVMe power management |
-| RestrictEvents | CPU name display, SB patches |
-| SMCRadeonSensors | GPU temp monitoring |
-| USBToolBox + USBMap | USB port mapping |
+| Kext                     | Purpose                                     |
+| ------------------------ | ------------------------------------------- |
+| Lilu                     | Patching framework (required by all others) |
+| VirtualSMC               | SMC emulation                               |
+| WhateverGreen            | GPU patching (RX 6600)                      |
+| AppleIGC                 | Intel I226-V Ethernet (disabled for now)    |
+| AppleMCEReporterDisabler | Prevents MCE crashes on AMD                 |
+| NVMeFix                  | NVMe power management                       |
+| RestrictEvents           | CPU name display, SB patches                |
+| SMCRadeonSensors         | GPU temp monitoring                         |
+| USBToolBox + USBMap      | USB port mapping                            |
 
 ## ACPI Patches
 
-| SSDT | Purpose |
-|------|---------|
-| SSDT-EC | Fake Embedded Controller |
-| SSDT-PLUG-ALT | AMD CPU power management |
-| SSDT-USB-Reset | USB controller reset |
-| SSDT-USBX | USB power properties |
+| SSDT                      | Purpose                                        |
+| ------------------------- | ---------------------------------------------- |
+| SSDT-EC                   | Fake Embedded Controller                       |
+| SSDT-PLUG-ALT             | AMD CPU power management                       |
+| SSDT-USB-Reset            | USB controller reset                           |
+| SSDT-USBX                 | USB power properties                           |
 | SSDT-Disable_Network_GPP7 | Disables onboard Intel WiFi (using BCM94360NG) |
 
 ## Acknowledgements

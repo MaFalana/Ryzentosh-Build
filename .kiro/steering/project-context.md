@@ -4,8 +4,8 @@ inclusion: auto
 
 # Project Context: Ryzentosh Build
 
-> Last Updated: 2026-08-22
-> Last Scanned: 2026-08-22
+> Last Updated: 2026-08-23
+> Last Scanned: 2026-08-23
 
 ## Project Overview
 
@@ -13,8 +13,9 @@ A Hackintosh (Ryzentosh) build configuration repository for running macOS Sequoi
 
 ## Tech Stack
 
-- **Bootloader:** OpenCore (latest EFI dated 2026-06-27)
-- **Target OS:** macOS Sequoia (15.x) → macOS Tahoe (26.x, upgrade in progress)
+- **Bootloader:** OpenCore REL-106-2025-08-02 (deployed to internal NVMe EFI, 2026-08-23)
+- **Target OS:** macOS Sequoia (15.x) — boot debugging in progress
+- **Future Target:** macOS Tahoe (26.x, on hold)
 - **CPU Architecture:** AMD Zen 4 (Ryzen 9 7950X, 16-core)
 - **Platform:** AM5 / B850 chipset
 - **SMBIOS:** iMacPro1,1
@@ -65,86 +66,87 @@ The project follows a date-based EFI versioning pattern (`EFI YYYYMMDD`) — eac
 
 ## Key Files & Entry Points
 
-| Path | Description |
-|------|-------------|
-| `_EFI (20260627)/OC/config.plist` | **Active config** — currently deployed EFI partition (June 2026) |
-| `_EFI (20260627)/OC/oldConfig.plist` | Previous config backup |
-| `Tahoe/EFI/OC/config.plist` | macOS Tahoe EFI config (upgrade target) |
-| `Sequioa/EFI 20250907/OC/config.plist` | Sequoia config (historical, working) |
-| `Sequioa/EFI 20250907/OC/ACPI/` | SSDT patches: EC, PLUG-ALT, USB Reset, USBX, Network disable |
-| `README.md` | Hardware specification table for this build |
-| `Programming Setup - Mac (Silicoln) 2025.command` | Full dev environment setup (Homebrew, apps, Python, Git) |
-| `macOS Install Prompts.command` | createinstallmedia commands (reference for USB installers) |
-| `Remote Connections/Custom PC.rdp` | RDP connection to this machine (hostname: DESKTOP-HNJ2RAT) |
+| Path                                              | Description                                                      |
+| ------------------------------------------------- | ---------------------------------------------------------------- |
+| `_EFI (20260627)/OC/config.plist`                 | **Active config** — currently deployed EFI partition (June 2026) |
+| `_EFI (20260627)/OC/oldConfig.plist`              | Previous config backup                                           |
+| `Tahoe/EFI/OC/config.plist`                       | macOS Tahoe EFI config (upgrade target)                          |
+| `Sequioa/EFI 20250907/OC/config.plist`            | Sequoia config (historical, working)                             |
+| `Sequioa/EFI 20250907/OC/ACPI/`                   | SSDT patches: EC, PLUG-ALT, USB Reset, USBX, Network disable     |
+| `README.md`                                       | Hardware specification table for this build                      |
+| `Programming Setup - Mac (Silicoln) 2025.command` | Full dev environment setup (Homebrew, apps, Python, Git)         |
+| `macOS Install Prompts.command`                   | createinstallmedia commands (reference for USB installers)       |
+| `Remote Connections/Custom PC.rdp`                | RDP connection to this machine (hostname: DESKTOP-HNJ2RAT)       |
 
 ## Hardware Specification
 
-| Component | Model |
-|-----------|-------|
-| Motherboard | ASUS ROG STRIX B850-A Gaming WiFi |
-| CPU | AMD Ryzen 9 7950X (16-core, Zen 4) |
-| GPU | AMD Radeon RX 6600 |
-| RAM | 2x32GB Crucial DDR5 Pro 5600MHz (64GB total) |
-| Audio | AMD High Definition Audio Device |
-| Ethernet | Intel I226-V |
-| WiFi/BT | BCM94360NG with FV-HB1200 adapter (native macOS support) |
-| Storage | 500GB NVMe SSD |
-| Bluetooth | Apple Broadcom Built-In Bluetooth (via BCM94360NG) |
+| Component   | Model                                                    |
+| ----------- | -------------------------------------------------------- |
+| Motherboard | ASUS ROG STRIX B850-A Gaming WiFi                        |
+| CPU         | AMD Ryzen 9 7950X (16-core, Zen 4)                       |
+| GPU         | AMD Radeon RX 6600                                       |
+| RAM         | 2x32GB Crucial DDR5 Pro 5600MHz (64GB total)             |
+| Audio       | AMD High Definition Audio Device                         |
+| Ethernet    | Intel I226-V                                             |
+| WiFi/BT     | BCM94360NG with FV-HB1200 adapter (native macOS support) |
+| Storage     | 500GB NVMe SSD                                           |
+| Bluetooth   | Apple Broadcom Built-In Bluetooth (via BCM94360NG)       |
 
 ## Kexts (Kernel Extensions)
 
 ### Sequoia Config (EFI 20250907)
 
-| Kext | Version | Purpose | Enabled |
-|------|---------|---------|---------|
-| Lilu | 1.7.2 | Patching framework (required by all other kexts) | ✅ |
-| VirtualSMC | 1.3.8 | SMC emulation (required for macOS boot) | ✅ |
-| WhateverGreen | 1.7.1 | GPU patching and fixes | ✅ |
-| AppleIGC | 1.6d1 | Intel I226-V Ethernet driver | ❌ (disabled) |
-| AppleMCEReporterDisabler | 1.2 | Prevents MCE crashes on AMD | ✅ |
-| NVMeFix | 1.1.4 | NVMe power management fix | ✅ |
-| RestrictEvents | 1.1.7 | CPU name, memory warnings, SB patches | ✅ |
-| SMCRadeonSensors | 2.4.0 | GPU temperature monitoring | ✅ |
-| USBToolBox | 1.1.1 | USB port mapping tool | ✅ |
-| USBMap | 1.1 | Custom USB port map | ✅ |
-| XHCI-unsupported | — | XHCI controller support (present in EFI) | — |
+| Kext                     | Version | Purpose                                          | Enabled      |
+| ------------------------ | ------- | ------------------------------------------------ | ------------ |
+| Lilu                     | 1.7.2   | Patching framework (required by all other kexts) | ✅            |
+| VirtualSMC               | 1.3.8   | SMC emulation (required for macOS boot)          | ✅            |
+| WhateverGreen            | 1.7.1   | GPU patching and fixes                           | ✅            |
+| AppleIGC                 | 1.6d1   | Intel I226-V Ethernet driver                     | ❌ (disabled) |
+| AppleMCEReporterDisabler | 1.2     | Prevents MCE crashes on AMD                      | ✅            |
+| NVMeFix                  | 1.1.4   | NVMe power management fix                        | ✅            |
+| RestrictEvents           | 1.1.7   | CPU name, memory warnings, SB patches            | ✅            |
+| SMCRadeonSensors         | 2.4.0   | GPU temperature monitoring                       | ✅            |
+| USBToolBox               | 1.1.1   | USB port mapping tool                            | ✅            |
+| USBMap                   | 1.1     | Custom USB port map                              | ✅            |
+| XHCI-unsupported         | —       | XHCI controller support (present in EFI)         | —            |
 
 ### Tahoe Config (new)
 
-| Kext | Purpose | Notes |
-|------|---------|-------|
-| Lilu | Patching framework | Carried over |
-| VirtualSMC | SMC emulation | Carried over |
-| **NootRX** | RDNA GPU driver (replaces WhateverGreen) | **New** — required for Tahoe GPU support |
-| AppleIGC | Intel I226-V Ethernet | Present (status TBD) |
-| AppleMCEReporterDisabler | Prevents MCE crashes | Carried over |
-| NVMeFix | NVMe power management | Carried over |
-| RestrictEvents | CPU name, SB patches | Carried over |
-| USBToolBox | USB port mapping tool | Carried over |
-| USBMap | Custom USB port map | Carried over |
+| Kext                     | Purpose                                  | Notes                                    |
+| ------------------------ | ---------------------------------------- | ---------------------------------------- |
+| Lilu                     | Patching framework                       | Carried over                             |
+| VirtualSMC               | SMC emulation                            | Carried over                             |
+| **NootRX**               | RDNA GPU driver (replaces WhateverGreen) | **New** — required for Tahoe GPU support |
+| AppleIGC                 | Intel I226-V Ethernet                    | Present (status TBD)                     |
+| AppleMCEReporterDisabler | Prevents MCE crashes                     | Carried over                             |
+| NVMeFix                  | NVMe power management                    | Carried over                             |
+| RestrictEvents           | CPU name, SB patches                     | Carried over                             |
+| USBToolBox               | USB port mapping tool                    | Carried over                             |
+| USBMap                   | Custom USB port map                      | Carried over                             |
 
 **Dropped from Tahoe:** WhateverGreen (replaced by NootRX), SMCRadeonSensors, XHCI-unsupported
 
 ## ACPI Patches (SSDTs)
 
-| SSDT | Purpose |
-|------|---------|
+| SSDT                      | Purpose                                                            |
+| ------------------------- | ------------------------------------------------------------------ |
 | SSDT-Disable_Network_GPP7 | Disables onboard Intel network controller (replaced by BCM94360NG) |
-| SSDT-EC | Fake Embedded Controller for macOS |
-| SSDT-PLUG-ALT | CPU power management (AMD alternative) |
-| SSDT-USB-Reset | USB controller reset |
-| SSDT-USBX | USB power properties |
+| SSDT-EC                   | Fake Embedded Controller for macOS                                 |
+| SSDT-PLUG-ALT             | CPU power management (AMD alternative)                             |
+| SSDT-USB-Reset            | USB controller reset                                               |
+| SSDT-USBX                 | USB power properties                                               |
 
 ## Boot Arguments
 
 ```
--v debug=0x100 keepsyms=1 agdpmod=pikera
+-v debug=0x100 keepsyms=1 agdpmod=pikera npci=0x2000
 ```
 
 - `-v` — Verbose boot (shows text log during boot)
 - `debug=0x100` — Prevent reboot on panic (shows crash info)
 - `keepsyms=1` — Keep symbols for panic logs
 - `agdpmod=pikera` — Disable board-id check for AMD GPUs (required for RX 6600)
+- `npci=0x2000` — Fix PCI configuration space on AM5/B850
 
 ## NVRAM Notable Settings
 
@@ -155,30 +157,28 @@ The project follows a date-based EFI versioning pattern (`EFI YYYYMMDD`) — eac
 
 ## Active Work Streams
 
-- **macOS Tahoe upgrade in progress** — New `Tahoe/` EFI with NootRX replacing WhateverGreen (key GPU kext change for Tahoe compatibility)
-- Active EFI is dated June 27, 2026 (`_EFI (20260627)`) — confirms ongoing maintenance
-- `_EFI` includes Microsoft boot manager — dual-boot with Windows is active
-- Tahoe EFI drops SMCRadeonSensors and XHCI-unsupported (likely no longer needed)
-- UM560 XT Drivers folder added — secondary machine (Minisforum mini PC) being managed
-- Build appears functional with macOS Sequoia (screenshots from Sep 2025)
-- README "Working" and "Not Working" sections still empty
+- **macOS Sequoia boot — kernel panic debugging** — EFI-20260822 deployed to internal NVMe, reaches EXITBS but panics in kernel init. Testing with ProvideCurrentCpuInfo=false and npci=0x2000.
+- **EFI deployed to internal drive** — No longer using USB EFI; internal NVMe (Disk 1) has the development config.
+- **OpenCore boot entry** recreated via bcdedit after NVRAM reset wiped it (GUID: `{f0bf55ab-6c60-11f0-8f20-e9a41c9958d2}`)
+- **Triple-boot target:** Windows 11, SteamOS, macOS Sequoia (each on separate NVMe)
+- **macOS Tahoe upgrade** — on hold until Sequoia boots successfully
 
 ## Decisions Log
 
-| Date | Decision | Rationale |
-|------|----------|-----------|
-| 2026-06-27 | Active EFI backup includes Microsoft boot loader | Dual-boot Windows + macOS confirmed |
-| 2026-06 | NootRX replaces WhateverGreen for Tahoe | NootRX is the successor GPU kext for RDNA GPUs on newer macOS versions |
-| 2026-06 | Drop SMCRadeonSensors in Tahoe | Likely integrated into NootRX or no longer compatible |
-| 2026-06 | Drop XHCI-unsupported in Tahoe | USB controllers properly supported in newer macOS |
-| 2025-09-07 | Use iMacPro1,1 SMBIOS | Best match for AMD + dGPU (no iGPU) configurations |
-| 2025-09-07 | BCM94360NG WiFi/BT card | Native macOS support — no kext needed for AirDrop, Handoff, Continuity |
-| 2025-09-07 | Disable onboard Intel network via SSDT | Replaced by BCM94360NG; prevents conflicts |
-| 2025-09-07 | Shaneee PAT patch over algrey | `_mtrr_update_action` — Shaneee variant enabled for both ≤13 and 15.0+ |
-| 2025-09-07 | CaseySJ PCI patches for AM5 | Fix PCI bus enumeration + disable 10-bit tags (required for B850/AM5) |
-| 2025-09-07 | Verbose boot (`-v`) kept enabled | Still in active development/troubleshooting phase |
-| 2025-09-07 | SecureBootModel = Default | Allows OTA updates while maintaining SB compatibility |
-| 2025-09-07 | DummyPowerManagement = true | Required for AMD CPUs — prevents XCPM crashes |
+| Date       | Decision                                         | Rationale                                                              |
+| ---------- | ------------------------------------------------ | ---------------------------------------------------------------------- |
+| 2026-06-27 | Active EFI backup includes Microsoft boot loader | Dual-boot Windows + macOS confirmed                                    |
+| 2026-06    | NootRX replaces WhateverGreen for Tahoe          | NootRX is the successor GPU kext for RDNA GPUs on newer macOS versions |
+| 2026-06    | Drop SMCRadeonSensors in Tahoe                   | Likely integrated into NootRX or no longer compatible                  |
+| 2026-06    | Drop XHCI-unsupported in Tahoe                   | USB controllers properly supported in newer macOS                      |
+| 2025-09-07 | Use iMacPro1,1 SMBIOS                            | Best match for AMD + dGPU (no iGPU) configurations                     |
+| 2025-09-07 | BCM94360NG WiFi/BT card                          | Native macOS support — no kext needed for AirDrop, Handoff, Continuity |
+| 2025-09-07 | Disable onboard Intel network via SSDT           | Replaced by BCM94360NG; prevents conflicts                             |
+| 2025-09-07 | Shaneee PAT patch over algrey                    | `_mtrr_update_action` — Shaneee variant enabled for both ≤13 and 15.0+ |
+| 2025-09-07 | CaseySJ PCI patches for AM5                      | Fix PCI bus enumeration + disable 10-bit tags (required for B850/AM5)  |
+| 2025-09-07 | Verbose boot (`-v`) kept enabled                 | Still in active development/troubleshooting phase                      |
+| 2025-09-07 | SecureBootModel = Default                        | Allows OTA updates while maintaining SB compatibility                  |
+| 2025-09-07 | DummyPowerManagement = true                      | Required for AMD CPUs — prevents XCPM crashes                          |
 
 ## Open Questions
 
@@ -221,3 +221,24 @@ The project follows a date-based EFI versioning pattern (`EFI YYYYMMDD`) — eac
 - **`_EFI (20260627)`** is a full EFI partition dump including the Windows boot manager — confirms active dual-boot
 - The `macOS Install Prompts.command` stores `createinstallmedia` commands for reference (currently only has Monterey commands — may be outdated)
 - **NootRX** in the Tahoe config is a significant change — it's the ChefKissInc successor to WhateverGreen for RDNA GPUs, providing native-like GPU acceleration
+
+
+## OpenCore Log Reading Procedure
+
+When checking boot logs after a reboot:
+
+1. **Always remount:** `Start-Process cmd -ArgumentList '/c mountvol W: /s ...' -Verb RunAs -Wait` (unmounts on every reboot)
+2. **List ALL files sorted by date:** `dir W:\opencore*.txt /o-d`
+3. **Scan ALL recent files for content** — don't stop at the first empty one. OC creates empty files for picker sessions.
+4. **Read using binary copy + null-strip:** Files are 256KB fixed-size with null padding. Use `[System.IO.File]::ReadAllBytes` then strip `\0`.
+5. **Check the TAIL of the log** for OC-specific errors: lines starting with `OC:` or `OCB:` indicate OpenCore-level failures (missing kexts, allocation errors).
+6. **BIOS clock is UTC**, user is EST (UTC-4). File named `191021` = 7:10 PM EST.
+7. **Boot.efi logs end at EXITBS** — anything after EXITBS is invisible to these logs. Kernel panics post-EXITBS won't appear here.
+8. **Two log types exist:** boot.efi writes AAPL-prefixed lines. OC itself writes `OC:` prefixed lines at the END of the same file (after the AAPL section).
+
+**Common patterns:**
+- `OC: Plist ... is missing` = kext referenced in config but not in Kexts folder
+- `Boot failed - Aborted` + `Displaying boot failure graphic` = boot.efi couldn't proceed (memory allocation, missing files, or security check failure)
+- `EXITBS:START` at end = boot.efi handed off successfully, crash is in kernel
+
+**Last log read:** opencore-2026-08-24-191021.txt

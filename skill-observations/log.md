@@ -221,3 +221,147 @@
 **Suggested improvement:** Consider a standardized "handoff" doc pattern for multi-machine workflows: current state, what needs to happen next, which files matter, and key decisions already made. Could live at a predictable path like `docs/current-status.md` or `.kiro/steering/current-status.md` (auto-included).
 
 **Principle:** When work spans multiple machines/sessions, make the transfer state explicit and machine-readable rather than relying on conversation history.
+
+
+---
+
+### Observation 14: NVRAM reset wipes custom UEFI boot entries
+
+**Status:** OPEN
+**Date:** 2026-08-23
+**Disposition:** AGENT-ACTION
+**Session context:** Deploying EFI-20260822 to internal NVMe, advised NVRAM reset
+**Skill:** Hackintosh boot debugging
+**Phase/Area:** NVRAM reset side effects
+
+**Issue:** Advised user to reset NVRAM without warning that it would wipe the custom "OpenCore" UEFI boot entry from the firmware. Result: system stuck on ROG logo because BIOS had no boot entry pointing to OpenCore.efi. Had to boot into Windows via BIOS menu and recreate the entry with bcdedit. This is the second time (obs #12) that NVRAM reset instructions failed to account for the full consequences.
+
+**Suggested improvement:** Always warn that NVRAM reset will wipe custom UEFI boot entries. Before advising it, confirm: (1) user knows they'll need to re-add the boot entry, or (2) the fallback BOOTx64.efi path will work. Better yet: document the bcdedit restore command alongside any NVRAM reset instruction.
+
+**Principle:** NVRAM reset is not scoped to just OpenCore variables — it affects firmware-level boot entries. Always document the recovery path alongside destructive reset instructions.
+
+---
+
+### Observation 15: EFI partition space constraints require awareness before operations
+
+**Status:** OPEN
+**Date:** 2026-08-23
+**Disposition:** AGENT-ACTION
+**Session context:** Attempted to back up EFI to the same partition, ran out of space
+**Skill:** Hackintosh EFI management workflow
+**Phase/Area:** Pre-operation checks
+
+**Issue:** Tried to xcopy the existing EFI as a backup to the same 100MB EFI partition. Predictably failed with "Insufficient disk space." Should have checked free space first and recognized the repo already contains the backup (EFI-20260627).
+
+**Suggested improvement:** Before any EFI partition write operation: (1) check free space, (2) check if a backup already exists in the repo, (3) never write backups to the same partition unless confirmed there's room.
+
+**Principle:** On constrained storage (EFI partitions), always check available space before write operations. Use the repo as the backup, not the partition itself.
+
+---
+
+### Observation 16: Elevated access required for EFI partition on Windows — non-obvious failure mode
+
+**Status:** OPEN
+**Date:** 2026-08-23
+**Disposition:** AGENT-ACTION
+**Session context:** Trying to read W:\ after user mounted it with diskpart
+**Skill:** Hackintosh EFI management workflow
+**Phase/Area:** Windows EFI access
+
+**Issue:** User mounted the EFI partition to W: with diskpart (elevated), but the Kiro terminal couldn't read it — showed empty. Required `Start-Process -Verb RunAs` wrapper for every command. This added complexity to every operation and wasn't immediately obvious.
+
+**Suggested improvement:** When working with EFI partitions on Windows, always use the elevated wrapper pattern from the start. Don't try non-elevated access first.
+
+**Principle:** EFI partition access on Windows always requires elevation, even if the mount was done elevated. Assume elevation is needed from the start.
+
+
+
+---
+
+### Observation 17: Memory allocation errors masquerade as kernel panics when OC debug logging is incomplete
+
+**Status:** OPEN
+**Date:** 2026-08-24
+**Disposition:** AGENT-ACTION
+**Session context:** OCSimplify-generated config revealed the real boot failure was EB.MM.AKMR (memory allocation), not a kernel panic
+**Skill:** Hackintosh boot debugging
+**Phase/Area:** Error diagnosis
+
+**Issue:** Spent ~8 attempts tweaking kernel patches, SMBIOS, PAT patches, and BIOS settings believing the crash was a post-EXITBS kernel panic. The old config reached EXITBS (showing "success") but the OCSimplify config — with different Booter quirks — exposed that the real issue was a memory allocation failure (EB.MM.AKMR Err(0xE), STOP 0x15). The old config's SetupVirtualMap/Booter settings were masking or working around this differently, making it appear like a kernel issue.
+
+**Suggested improvement:** When encountering "reaches EXITBS then crashes with no output," check Booter memory quirks FIRST before blaming kernel patches. The EB.MM.AKMR error only appeared because OCSimplify used SetupVirtualMap=true (wrong for AM5). A fresh config from a generator can expose issues the hand-tuned config was accidentally working around.
+
+**Principle:** When iterative config changes produce identical failures, the problem is likely in a section you haven't touched. Fresh baselines from generators expose assumptions baked into hand-tuned configs.
+
+---
+
+### Observation 18: SetupVirtualMap must be false on AM5 with AGESA 1.2.0.2+
+
+**Status:** OPEN
+**Date:** 2026-08-24
+**Disposition:** AGENT-ACTION
+**Session context:** B850-A with AGESA ComboAM5PI_1202 failing with memory allocation error
+**Skill:** Hackintosh EFI management workflow
+**Phase/Area:** Platform-specific quirks
+
+**Issue:** OCSimplify set SetupVirtualMap=true by default, but AM5 boards with AGESA 1.2.0.2+ handle virtual memory mapping in firmware. The combination of SetupVirtualMap=true + the AM5 memory map caused boot.efi to fail allocating kernel memory. DevirtualiseMmio=true also needed to free MMIO regions.
+
+**Suggested improvement:** For any AM5/B850/B650/X670 board, SetupVirtualMap should always be false and DevirtualiseMmio should be true. Add this to a hardware-specific checklist.
+
+**Principle:** Platform-era-specific Booter quirks (AM5 vs AM4 vs Intel) should be treated as hard requirements, not optional tweaks.
+
+
+
+---
+
+### Observation 17: Exhaustive config changes with identical symptoms indicate non-config root cause
+
+**Status:** OPEN
+**Date:** 2026-08-24
+**Disposition:** AGENT-ACTION
+**Session context:** 8+ config iterations all producing identical EXITBS → kernel panic
+**Skill:** Hackintosh boot debugging
+**Phase/Area:** Root cause analysis
+
+**Issue:** Spent an entire session iterating on config tweaks (SMBIOS, PAT patches, PCI patches, ProvideCurrentCpuInfo, npci, CSM, IOPCIIsHotplugPort) plus a full OCSimplify fresh config — all producing the exact same failure. Should have recognized after 3 identical failures that the problem is outside the config (hardware, USB, BIOS, or installer corruption).
+
+**Suggested improvement:** After 3 identical post-EXITBS failures with different configs: stop changing config. The issue is either (1) corrupted installer media, (2) BIOS/firmware incompatibility, (3) hardware fault, or (4) USB port/controller issue. Switch to testing those before more config changes.
+
+**Principle:** When multiple fundamentally different configs produce identical symptoms, the cause is upstream of the config. Stop tweaking and look at the environment.
+
+---
+
+### Observation 18: OCSimplify automation script is reusable
+
+**Status:** OPEN
+**Date:** 2026-08-24
+**Disposition:** USER-ACTION
+**Session context:** Built run_ocsimplify.py to automate the interactive OCSimplify tool
+**Skill:** New skill candidate: Hackintosh tool automation
+**Phase/Area:** Tool integration
+
+**Issue:** OCSimplify is a useful tool but requires interactive input at every step. Built a Python wrapper (`Scripts/run_ocsimplify.py`) that monkey-patches the input function and drives the tool non-interactively. This makes it rerunnable from Kiro without manual intervention.
+
+**Suggested improvement:** Keep the automation script in the repo. Consider extending it to accept CLI args (macOS version, GPU kext choice) for different build targets. Could also add a diff step to compare generated config against the current one.
+
+**Principle:** Interactive CLI tools can be automated by monkey-patching their input functions. Useful for reproducible builds.
+
+
+
+---
+
+### Observation 19: OC log files aren't always the most recent by filename — check ALL recent timestamps
+
+**Status:** OPEN
+**Date:** 2026-08-24
+**Disposition:** AGENT-ACTION
+**Session context:** Missed log files because only checked the 2-3 newest by sort order
+**Skill:** Hackintosh boot debugging
+**Phase/Area:** Log retrieval
+
+**Issue:** Was checking only the top 2-3 files by date, missing that some "empty" files were newer while files with content had slightly older timestamps. Should scan ALL files from the session window and check each for content rather than assuming the newest file has the data.
+
+**Suggested improvement:** When checking OC logs: list ALL files, then check each for content (non-null). Don't assume the latest file has the boot log — OC creates the file at boot start but only writes content from boot.efi, not from the OC picker phase.
+
+**Principle:** Log filenames/timestamps don't always correlate with content. Check all candidates for actual data.
+

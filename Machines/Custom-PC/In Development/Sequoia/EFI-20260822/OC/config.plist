@@ -916,7 +916,7 @@
                     <key>Count</key>
                     <integer>1</integer>
                     <key>Enabled</key>
-                    <true/>
+                    <false/>
                     <key>Find</key>
                     <data>hAB1Sw==</data>
                     <key>Identifier</key>
@@ -1096,7 +1096,7 @@
                     <key>Count</key>
                     <integer>0</integer>
                     <key>Enabled</key>
-                    <true/>
+                    <false/>
                     <key>Find</key>
                     <data>icCB4v//AP+BygAAAAAPMA==</data>
                     <key>Identifier</key>
@@ -1156,7 +1156,7 @@
                 <key>PowerTimeoutKernelPanic</key>
                 <true/>
                 <key>ProvideCurrentCpuInfo</key>
-                <true/>
+                <false/>
                 <key>SetApfsTrimTimeout</key>
                 <integer>-1</integer>
                 <key>ThirdPartyDrives</key>
@@ -1417,7 +1417,7 @@
                 <key>SystemMemoryStatus</key>
                 <string>Auto</string>
                 <key>SystemProductName</key>
-                <string>iMacPro1,1</string>
+                <string>MacPro7,1</string>
                 <key>SystemSerialNumber</key>
                 <string>C02DM0UKHX87</string>
                 <key>SystemUUID</key>
