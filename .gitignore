@@ -1,6 +1,9 @@
 .DS_Store
 **/.DS_Store
 
+# SMBIOS secrets — never commit
+.env.smbios
+
 # Large binary drivers (exceed GitHub 100MB limit, re-downloadable)
 Machines/UM560-XT/Drivers/
 Machines/UM560-XT/*.exe
