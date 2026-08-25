@@ -365,3 +365,55 @@
 
 **Principle:** Log filenames/timestamps don't always correlate with content. Check all candidates for actual data.
 
+
+
+---
+
+### Observation 20: Forum research is the highest-leverage debugging step when config iteration fails
+
+**Status:** OPEN
+**Date:** 2026-08-24
+**Disposition:** AGENT-ACTION
+**Session context:** Finding the B850 EXITBS fix via AMD OS X forum after exhausting config changes
+**Skill:** Hackintosh boot debugging
+**Phase/Area:** Research strategy
+
+**Issue:** Spent an entire session (8+ config changes, BIOS update, OCSimplify rebuild, DebugEnhancer) before searching for "B850 hackintosh EXITBS" on the AMD OS X forum. The answer — disabling WhateverGreen on B850 — was posted in January 2026 by someone with the exact same chipset and symptoms. Should have searched the forum MUCH earlier, especially after 3 identical failures pointed to a non-config issue.
+
+**Suggested improvement:** After 3 identical failures with different configs, the NEXT step should be forum/community research for the specific chipset + symptom combination — not more config iteration. Search: AMD OS X forum, r/hackintosh, GitHub issues for the specific motherboard chipset.
+
+**Principle:** Community knowledge outperforms trial-and-error. When you hit a wall, search for your exact hardware + symptom before iterating further. Someone else has likely hit the same issue.
+
+---
+
+### Observation 21: WhateverGreen causes EXITBS crashes on B850/AM5 with RDNA2 GPUs
+
+**Status:** OPEN
+**Date:** 2026-08-24
+**Disposition:** AGENT-ACTION
+**Session context:** Confirmed by forum thread that WEG must be disabled for B850 boards
+**Skill:** Hackintosh EFI management workflow
+**Phase/Area:** Platform-specific kext rules
+
+**Issue:** WhateverGreen is recommended by every guide for AMD GPUs, but on B850 boards it causes a pre-kext-load crash (EXITBS → instant reboot). RDNA2 GPUs (RX 6000 series) have native macOS support in Sequoia/Tahoe and don't need WEG. The combination of B850 + WEG + RDNA2 is specifically broken.
+
+**Suggested improvement:** Add to a hardware compatibility matrix: B850 boards should NOT use WhateverGreen with RDNA2 GPUs. Native GPU support is sufficient. Also note that Resizable BAR should be ENABLED (contrary to standard Dortania AMD guide which says disable it).
+
+**Principle:** "Always include X kext" guides don't account for platform-specific incompatibilities. Newer chipsets + newer GPUs may work better WITHOUT legacy patching kexts.
+
+---
+
+### Observation 22: User proactively brings forum research — leverage it immediately
+
+**Status:** OPEN
+**Date:** 2026-08-24
+**Disposition:** AGENT-ACTION
+**Session context:** User pasted the B850 forum thread content directly into chat
+**Skill:** Cross-session context ingestion
+**Phase/Area:** User-provided research
+
+**Issue:** User found the B850 EXITBS thread themselves and pasted it. Rather than just acknowledging it, the correct response was to immediately extract the actionable fix, compare it against the current config, and produce specific instructions. Did this correctly this time (fetched page 2 for resolution, synthesized into config changes).
+
+**Suggested improvement:** When user pastes forum content, immediately: (1) identify if it's resolved, (2) extract the fix, (3) diff against current config, (4) produce step-by-step instructions. Don't just summarize — act on it.
+
+**Principle:** User-provided research is a strong signal of priority. Extract and act on it immediately rather than adding it to a queue of things to try.
