@@ -8,7 +8,11 @@
 
 ## Current State
 
-Kernel panic immediately after EXITBS on every attempt. BIOS updated to v1685 (AGESA 1.3.0.1b) — no change. Tested 8+ config variations AND a fresh OCSimplify EFI. This is NOT a config issue and NOT a BIOS issue.
+Kernel panic immediately after EXITBS on every attempt. BIOS updated to v1685 — no change. DebugEnhancer loaded — no output (crash is pre-kext-load). 
+
+**BREAKTHROUGH:** Found a forum thread where someone with an MSI B850 + RX 6800 had the EXACT same EXITBS problem and solved it. The fix was **disabling WhateverGreen** + BIOS tweaks + proper MMIO handling.
+
+Source: https://forum.amd-osx.com/threads/tahoe-installation-on-b850.6337/
 
 ## What's Been Ruled Out
 
@@ -22,65 +26,70 @@ Kernel panic immediately after EXITBS on every attempt. BIOS updated to v1685 (A
 - BIOS update v0806 → v1685 (AGESA 1.2.0.2 → 1.3.0.1b) — no change
 - Different USB port
 - Different macOS version (Monterey) — same issue
+- DebugEnhancer.kext — no output (crash too early for Lilu plugins)
 
-## Next Step: DebugEnhancer.kext
+## Next Step: Disable WhateverGreen + BIOS Changes
 
-The problem is we can't see what the kernel is doing after EXITBS. DebugEnhancer extends kernel logging past that point.
+A confirmed working B850 build (MSI MAG B850 Tomahawk + 9800X3D + RX 6800) got past EXITBS by:
+1. Disabling WhateverGreen (RDNA2 GPUs have native support)
+2. Enabling Resizable BAR
+3. Using `DisableVariableWrite=true` in Booter quirks
+4. Disabling WiFi/Ethernet in BIOS during testing
 
 ### Instructions (on PC / Windows side)
 
-1. **Download** DebugEnhancer v1.1.1 RELEASE from:
-   https://github.com/acidanthera/DebugEnhancer/releases/tag/1.1.1
+#### BIOS Changes
 
-2. **Extract** and copy `DebugEnhancer.kext` to `W:\EFI\OC\Kexts\`
+1. **Enable Resizable BAR** (currently disabled — change to Enabled)
+2. **Disable WiFi** (onboard Intel — not macOS compatible anyway)
+3. **Disable Ethernet** (Intel I226-V — temporarily for testing)
+4. **Confirm Fast Boot is OFF**
+5. Keep Above 4G Decoding Enabled, CSM Disabled
 
-3. **Add to config.plist** under `Kernel → Add` (after Lilu):
-   ```xml
-   <dict>
-       <key>Arch</key>
-       <string>x86_64</string>
-       <key>BundlePath</key>
-       <string>DebugEnhancer.kext</string>
-       <key>Comment</key>
-       <string>V1.1.1 - Kernel debug output</string>
-       <key>Enabled</key>
-       <true/>
-       <key>ExecutablePath</key>
-       <string>Contents/MacOS/DebugEnhancer</string>
-       <key>MaxKernel</key>
-       <string></string>
-       <key>MinKernel</key>
-       <string></string>
-       <key>PlistPath</key>
-       <string>Contents/Info.plist</string>
-   </dict>
+#### Config.plist Changes
+
+1. **Disable WhateverGreen:**
+   - Find WhateverGreen.kext entry under `Kernel → Add`
+   - Change `<true/>` to `<false/>` for its `Enabled` key
+
+2. **Add `DisableVariableWrite=true`:**
+   - Under `Booter → Quirks`
+   - Change `DisableVariableWrite` from `<false/>` to `<true/>`
+
+3. **Update boot-args:**
    ```
-
-4. **Update boot-args** to:
+   -v debug=0x100 keepsyms=1 npci=0x2000
    ```
-   -v debug=0x100 keepsyms=1 agdpmod=pikera npci=0x2000 -dbgenhdbg -dbgenhiolog
-   ```
+   - REMOVED: `agdpmod=pikera` (this is a WhateverGreen arg, does nothing without WEG)
+   - iMacPro1,1 SMBIOS has native dGPU support, so board-id check shouldn't trigger
 
-5. **Boot** and watch — you should now get visible kernel panic text on screen, or at minimum a much more detailed log file on the EFI partition.
+4. **Keep these Booter quirks as-is:**
+   - `DevirtualiseMmio=true` (should already be set from OCSimplify fix)
+   - `SetupVirtualMap=false` (required for AM5)
+   - `RebuildAppleMemoryMap=true`
+   - `SyncRuntimePermissions=true`
 
-### What DebugEnhancer Does
+#### Boot Test
 
-- Lilu plugin that enables kernel debug output after EXITBS
-- `-dbgenhdbg` turns on debug output
-- `-dbgenhiolog` redirects IOLog to screen (kernel vprintf)
-- Supports macOS 26 (Tahoe) — fully compatible with Sequoia
+1. Save config.plist
+2. Reboot → OpenCore picker
+3. Reset NVRAM (to clear old boot-args with agdpmod)
+4. After reboot, select macOS installer
+5. Watch for verbose text — you should get further than EXITBS now
 
-### After This Test
+### What to Expect
 
-If we get a readable panic, likely suspects are:
-- **GPU (RX 6600 / WhateverGreen)** — framebuffer init crash
-- **NVMe controller** — incompatible drive during early kernel init
-- **Memory mapping** — even post-BIOS-update
+- **If it works:** You'll see verbose scrolling text, possibly a 30-second black screen (this is normal for RDNA2 without WEG), then either installer or a readable kernel panic
+- **If same crash:** The GPU isn't the issue — would need to look at NVMe or get fabiosun's actual EFI config from the forum thread
 
-If GPU is the culprit, next steps would be:
-- Disable WhateverGreen (native Navi 23 support in Sequoia)
-- Try NootRX instead
-- Test with `-wegnoegpu` (black screen but confirms GPU is the issue)
+### Reference: Working B850 Config (from forum)
+
+The user `fabiosun` (runs ASUS X870E Hero + 9950X + dual 6950XT on Tahoe) provided configs that worked. Key differences from standard Dortania guide:
+- No WhateverGreen
+- `DisableVariableWrite=true` alongside `DevirtualiseMmio=true`
+- Resizable BAR enabled (not disabled like Dortania suggests for AMD)
+- WiFi/LAN disabled in BIOS during initial boot
+- Fresh USB installer (not cloned drive)
 
 ## EFI On Internal Drive
 
